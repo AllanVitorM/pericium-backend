@@ -1,29 +1,39 @@
-import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
-import { Role } from 'src/enums/role.enum';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
+import { Role } from 'src/common/enums/role.enum';
 
-export class CreateUserDTO{
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+export class CreateUserDTO {
+  @IsNumber()
+  @IsNotEmpty()
+  cpf: number;
 
-    @IsString()
-    @IsNotEmpty()
-    email: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    senha: string;
+  @IsString()
+  @IsNotEmpty()
+  email: string;
 
-    @IsEnum(Role)
-    role: Role;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsEnum(Role)
+  role: Role;
 }
 
-export class UpdateUserDTO{
-    @IsString()
-    @IsOptional()
-    email?: string;
+export class UpdateUserDTO {
+  @IsString()
+  @IsOptional()
+  email?: string;
 
-    @IsString()
-    @IsOptional()
-    senha?: string;
+  @IsString()
+  @IsOptional()
+  password?: string;
 }
