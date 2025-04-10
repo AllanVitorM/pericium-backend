@@ -14,6 +14,7 @@ async function bootstrap() {
     console.log('Rodou!');
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  app.enableCors();
+  await app.listen(8000);
 }
 bootstrap();
