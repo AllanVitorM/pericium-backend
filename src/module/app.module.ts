@@ -6,6 +6,9 @@ import { UserModule } from './user.module';
 import Configuration from 'src/config/Configuration';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from 'src/auth/auth.module';
+import { CaseModule } from './case.module';
+import { EvidenciaModule } from './evidencia.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -18,9 +21,13 @@ import { AuthModule } from 'src/auth/auth.module';
         uri: process.env.MONGO_URI,
       }),
     }),
+    MulterModule.register({
+      dest: './uploads',
+    }),
     UserModule,
     AuthModule,
     CaseModule,
+    EvidenciaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
