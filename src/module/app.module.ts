@@ -9,6 +9,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { CaseModule } from './case.module';
 import { EvidenciaModule } from './evidencia.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { LaudoModule } from './laudo.module';
 
 @Module({
   imports: [
@@ -28,8 +29,10 @@ import { MulterModule } from '@nestjs/platform-express';
     AuthModule,
     CaseModule,
     EvidenciaModule,
+    LaudoModule, 
   ],
   controllers: [AppController],
   providers: [AppService],
+
 })
 export class AppModule {}
