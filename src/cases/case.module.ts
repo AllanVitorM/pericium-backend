@@ -1,7 +1,7 @@
-import { CaseService } from '../service/case.service';
-import { CaseController } from '../controllers/case.controller';
+import { CaseService } from './case.service';
+import { CaseController } from './case.controller';
 import { Module } from '@nestjs/common';
-import { CaseSchema } from '../schemas/case.schema';
+import { CaseSchema } from './case.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({

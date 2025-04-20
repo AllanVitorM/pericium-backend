@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Caso, CaseDocument } from 'src/schemas/case.schema';
-import { CreateCaseDTO, UpdateCaseDTO } from 'src/DTO/case.dto';
+import { Caso, CaseDocument } from 'src/cases/case.schema';
+import { CreateCaseDTO, UpdateCaseDTO } from 'src/cases/case.dto';
+import { Status } from 'src/common/enums/status.enum';
 
 @Injectable()
 export class CaseService {
@@ -75,7 +76,7 @@ export class CaseService {
     }
 
     caso.dataFechamento = dataFechamento;
-    caso.status = 'ENCERRADO';
+    caso.status = Status.CONCLUIDO;
 
     return caso.save();
   }

@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AppController } from '../controllers/app.controller';
-import { AppService } from '../service/app.service';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user.module';
+import { UserModule } from './user/user.module';
 import Configuration from 'src/config/Configuration';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from 'src/auth/auth.module';
-import { CaseModule } from './case.module';
-import { EvidenciaModule } from './evidencia.module';
+import { CaseModule } from './cases/case.module';
+import { EvidenciaModule } from './evidencias/evidencia.module';
 import { MulterModule } from '@nestjs/platform-express';
-import { LaudoModule } from './laudo.module';
+import { LaudoModule } from './laudos/laudo.module';
 
 @Module({
   imports: [
@@ -29,10 +29,9 @@ import { LaudoModule } from './laudo.module';
     AuthModule,
     CaseModule,
     EvidenciaModule,
-    LaudoModule, 
+    LaudoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
-
 })
 export class AppModule {}

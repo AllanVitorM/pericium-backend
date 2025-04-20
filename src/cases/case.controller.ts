@@ -8,8 +8,8 @@ import {
   Param,
   BadRequestException,
 } from '@nestjs/common';
-import { CaseService } from 'src/service/case.service';
-import { CreateCaseDTO, UpdateCaseDTO } from 'src/DTO/case.dto';
+import { CaseService } from 'src/cases/case.service';
+import { CreateCaseDTO, UpdateCaseDTO } from 'src/cases/case.dto';
 
 @Controller('cases')
 export class CaseController {
