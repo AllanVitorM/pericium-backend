@@ -1,6 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export type LaudoDocument = Laudo & Document;
 @Schema()
 export class Laudo extends Document {
   @Prop({ required: true })
@@ -10,11 +11,19 @@ export class Laudo extends Document {
   description?: string;
 
   @Prop()
-  evidencia:({type: Types.ObjectId, ref: 'Evidencias'});
+  pdfUrl?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Evidencia' })
+  evidenciaId: string;
+
+  @Prop({ default: false })
+  assinado: boolean;
+
+  @Prop()
+  dataAssinatura?: Date;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  peritoresponsavel: string;
-
+  peritoAssinante?: Types.ObjectId;
 }
 
 export const LaudoSchema = SchemaFactory.createForClass(Laudo);

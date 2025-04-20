@@ -10,6 +10,9 @@ export class Evidencia extends Document {
   description?: string;
 
   @Prop()
+  tipo?: string;
+
+  @Prop()
   local?: string;
 
   @Prop({ required: true })
@@ -18,7 +21,7 @@ export class Evidencia extends Document {
   @Prop()
   imageUrl?: string;
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Cases' })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Case' })
   caseId: string;
 }
 

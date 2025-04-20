@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Evidencia, EvidenciaSchema } from 'src/schemas/evidencias';
-import { EvidenciaService } from '../service/evidencia.service';
-import { EvidenciaController } from '../controllers/evidencia.controller';
-import { CaseModule } from './case.module';
+import { Evidencia, EvidenciaSchema } from 'src/evidencias/evidencias.schema';
+import { EvidenciaService } from './evidencia.service';
+import { EvidenciaController } from './evidencia.controller';
+import { CaseModule } from '../cases/case.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({

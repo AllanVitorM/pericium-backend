@@ -8,10 +8,9 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
-  InternalServerErrorException,
 } from '@nestjs/common';
-import { EvidenciaService } from 'src/service/evidencia.service';
-import { CreateEvidenciaDTO, updateEvidenciaDTO } from 'src/DTO/evidencia.dto';
+import { EvidenciaService } from 'src/evidencias/evidencia.service';
+import { CreateEvidenciaDTO, updateEvidenciaDTO } from 'src/evidencias/evidencia.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { v2 as cloudinary } from 'cloudinary';
 import toStream from 'buffer-to-stream';

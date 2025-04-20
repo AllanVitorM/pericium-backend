@@ -1,9 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Evidencia } from 'src/schemas/evidencias';
-import { CreateEvidenciaDTO, updateEvidenciaDTO } from 'src/DTO/evidencia.dto';
-import { CaseService } from './case.service';
+import { Evidencia } from 'src/evidencias/evidencias.schema';
+import {
+  CreateEvidenciaDTO,
+  updateEvidenciaDTO,
+} from 'src/evidencias/evidencia.dto';
+import { CaseService } from '../cases/case.service';
 import {
   UploadApiResponse,
   UploadApiErrorResponse,
@@ -35,7 +38,7 @@ export class EvidenciaService {
       // Transforma upload_stream em Promise<string>
       imageUrl = await new Promise<string>((resolve, reject) => {
         const uploadStream = this.cloudinary.uploader.upload_stream(
-          { folder: 'evidencias' },
+          { folder: 'evidencias', resource_type: 'auto', type: 'upload' },
           (
             error: UploadApiErrorResponse | undefined,
             result: UploadApiResponse | undefined,

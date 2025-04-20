@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { Status } from 'src/common/enums/status.enum';
 
 export type CaseDocument = Caso & Document;
 
@@ -12,7 +13,7 @@ export class Caso {
   descricao: string;
 
   @Prop({ required: true })
-  status: string;
+  status: Status;
 
   @Prop({ type: Date, required: true })
   dataAbertura: Date;

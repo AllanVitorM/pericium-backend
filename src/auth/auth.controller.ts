@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDocument } from 'src/schemas/user.schema';
+import { UserDocument } from 'src/user/user.schema';
 import { jwtpayload } from './interfaces/jwt.interface';
 
 @Controller('auth')
