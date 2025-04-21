@@ -10,32 +10,41 @@ import {
 } from '@nestjs/common';
 import { CaseService } from 'src/cases/case.service';
 import { CreateCaseDTO, UpdateCaseDTO } from 'src/cases/case.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Role } from 'src/common/enums/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cases')
 export class CaseController {
   constructor(private readonly CaseService: CaseService) {}
 
+  @Roles(Role.ADMIN, Role.PERITO)
   @Post()
   async create(@Body() createCaseDTO: CreateCaseDTO) {
     return this.CaseService.create(createCaseDTO);
   }
-
+  @Roles(Role.ADMIN, Role.PERITO, Role.PERITO)
   @Get()
   async findAll() {
     return this.CaseService.findAll();
   }
 
+  @Roles(Role.ADMIN, Role.PERITO, Role.PERITO)
   @Get('titulo/:titulo')
   async findOne(@Param('titulo') titulo: string) {
     return this.CaseService.findOne(titulo);
   }
 
+  @Roles(Role.ADMIN, Role.PERITO, Role.PERITO)
   @Get('dataabertura/:dataabertura')
   async findByDataAbertura(@Param('dataabertura') DataAbertura: string) {
     const date = new Date(DataAbertura);
 
-    if(isNaN(date.getTime())){
-      throw new BadRequestException('Data Inválida.')
+    if (isNaN(date.getTime())) {
+      throw new BadRequestException('Data Inválida.');
     }
 
     const start = new Date(date);
@@ -47,46 +56,33 @@ export class CaseController {
     return this.CaseService.findOneDataAbertura(start, end);
   }
 
-  @Put('titulo/:titulo')
+  @Roles(Role.ADMIN, Role.PERITO)
+  @Put(':id')
   async updateCase(
-    @Param('titulo') titulo: string,
+    @Param('id') id: string,
     @Body() updateCaseDTO: UpdateCaseDTO,
   ) {
-    return this.CaseService.update(titulo, updateCaseDTO);
-  }
-  @Put('descricao/:descricao')
-  async updateByDescricao(
-    @Param('descricao') descricao: string,
-    @Body() updateCaseDTO: UpdateCaseDTO,
-  ) {
-    return this.CaseService.updateByDescricao(descricao, updateCaseDTO);
+    return this.CaseService.update(id, updateCaseDTO);
   }
 
-  @Put(':titulo/datafechamento')
+  @Roles(Role.ADMIN, Role.PERITO)
+  @Put(':id/datafechamento')
   async updateDataFechamento(
-    @Param('titulo') titulo: string,
+    @Param('id') id: string,
     @Body('dataFechamento') dataFechamentoStr: string,
   ) {
     const dataFechamento = new Date(dataFechamentoStr);
-    return this.CaseService.updateByDataFechamento(titulo, dataFechamento);
+    return this.CaseService.updateByDataFechamento(id, dataFechamento);
   }
 
-  @Delete('titulo/:titulo')
-  async deleteCase(@Param('titulo') titulo: string) {
-    const wasDeleted = await this.CaseService.remove(titulo);
+  @Roles(Role.ADMIN, Role.PERITO)
+  @Delete(':id')
+  async deleteCase(@Param('id') id: string) {
+    const wasDeleted = await this.CaseService.remove(id);
     if (wasDeleted) {
-      return { message: `Caso ${titulo} foi evaporado com sucesso!` };
+      return { message: `Caso ${id} foi evaporado com sucesso!` };
     } else {
-      return { message: `Caso ${titulo} deu fuga com sucesso!` };
-    }
-  }
-  @Delete('descricao/:descricao')
-  async deleteCaseBy(@Param('descricao') descricao: string) {
-    const wasDeleted = await this.CaseService.removeByDescricao(descricao);
-    if (wasDeleted) {
-      return { message: `Caso ${descricao} foi evaporado com sucesso!` };
-    } else {
-      return { message: `Caso ${descricao} deu fuga com sucesso!` };
+      return { message: `Caso ${id} deu fuga com sucesso!` };
     }
   }
 }

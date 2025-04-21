@@ -36,40 +36,18 @@ export class CaseService {
       .exec();
   }
 
-  async update(
-    titulo: string,
-    updateCaseDTO: UpdateCaseDTO,
-  ): Promise<Caso | null> {
-    const existingCase = await this.caseModel.findOne({ titulo });
-    if (!existingCase) return null;
-
-    return this.caseModel
-      .findOneAndUpdate({ titulo }, updateCaseDTO, { new: true })
-      .exec();
+  async update(id: string, data: Partial<UpdateCaseDTO>) {
+    return this.caseModel.findByIdAndUpdate(id, data, { new: true }).exec();
   }
 
-  async updateByDescricao(
-    descricao: string,
-    updateCaseDTO: UpdateCaseDTO,
-  ): Promise<Caso | null> {
-    const existingCase = await this.caseModel.findOne({ descricao }).exec();
-
-    if (!existingCase) {
-      return null;
-    }
-
-    return this.caseModel
-      .findOneAndUpdate({ descricao }, updateCaseDTO, { new: true })
-      .exec();
-  }
   async updateByDataFechamento(
-    titulo: string,
+    id: string,
     dataFechamento: Date,
   ): Promise<Caso> {
-    const caso = await this.caseModel.findOne({ titulo });
+    const caso = await this.caseModel.findOne({ _id: id });
 
     if (!caso) {
-      throw new NotFoundException(`Caso com título '${titulo} não encontrado`);
+      throw new NotFoundException(`Caso com título '${id}' não encontrado`);
     }
     if (caso.dataFechamento) {
       throw new BadRequestException('Este caso já está fechado.');
@@ -81,13 +59,8 @@ export class CaseService {
     return caso.save();
   }
 
-  async remove(titulo: string): Promise<boolean> {
-    const result = await this.caseModel.deleteOne({ titulo }).exec();
-    return result.deletedCount > 0;
-  }
-
-  async removeByDescricao(descricao: string): Promise<boolean> {
-    const result = await this.caseModel.deleteOne({ descricao }).exec();
+  async remove(id: string): Promise<boolean> {
+    const result = await this.caseModel.deleteOne({ _id: id }).exec();
     return result.deletedCount > 0;
   }
 }

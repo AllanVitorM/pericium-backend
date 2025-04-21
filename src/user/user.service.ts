@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { User, UserDocument } from 'src/user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateUserDTO, UpdateUserDTO } from 'src/user/user.dto';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  AdminUpdateUserDTO,
+} from 'src/user/user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -33,20 +37,22 @@ export class UserService {
 
   async update(
     cpf: string,
-    updateUserDTO: UpdateUserDTO,
+    data: Partial<UpdateUserDTO | AdminUpdateUserDTO>,
   ): Promise<User | null> {
     const user = await this.userModel.findOne({ cpf });
 
     if (!user) return null;
 
-    if (updateUserDTO.password && updateUserDTO.password !== user.password) {
+    if (
+      'password' in data &&
+      data.password &&
+      data.password !== user.password
+    ) {
       const salt = await bcrypt.genSalt(10);
-      updateUserDTO.password = await bcrypt.hash(updateUserDTO.password, salt);
+      data.password = await bcrypt.hash(data.password, salt);
     }
 
-    return this.userModel
-      .findOneAndUpdate({ cpf }, updateUserDTO, { new: true })
-      .exec();
+    return this.userModel.findOneAndUpdate({ cpf }, data, { new: true }).exec();
   }
 
   async remove(cpf: string): Promise<boolean> {

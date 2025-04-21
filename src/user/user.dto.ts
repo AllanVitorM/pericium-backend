@@ -37,3 +37,13 @@ export class UpdateUserDTO {
   @IsOptional()
   password?: string;
 }
+
+export class AdminUpdateUserDTO {
+  @IsString()
+  @IsOptional()
+  role?: Role;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
+}

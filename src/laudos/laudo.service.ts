@@ -82,4 +82,10 @@ export class LaudoService {
   async findOneById(id: string): Promise<Laudo | null> {
     return this.laudoModel.findById(id);
   }
+
+  async remove(id: string): Promise<void> {
+    const result = await this.laudoModel.findByIdAndDelete(id);
+    if (!result)
+      throw new NotFoundException('Evidência não encontrada para deletar');
+  }
 }
