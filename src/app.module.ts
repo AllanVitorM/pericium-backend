@@ -10,6 +10,8 @@ import { CaseModule } from './cases/case.module';
 import { EvidenciaModule } from './evidencias/evidencia.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { LaudoModule } from './laudos/laudo.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/jwtAuthGuard';
 
 @Module({
   imports: [
@@ -32,6 +34,12 @@ import { LaudoModule } from './laudos/laudo.module';
     LaudoModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

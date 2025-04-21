@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
+import { Status } from 'src/common/enums/status.enum';
 
 export class CreateCaseDTO {
   @IsString()
@@ -11,7 +17,7 @@ export class CreateCaseDTO {
 
   @IsString()
   @IsNotEmpty()
-  status: string;
+  status: Status;
 
   @IsDateString()
   @IsNotEmpty()
@@ -20,14 +26,14 @@ export class CreateCaseDTO {
 
 export class UpdateCaseDTO {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   titulo?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   descricao?: string;
 
   @IsString()
-  @IsNotEmpty()
-  status?: string;
+  @IsOptional()
+  status?: Status;
 }
