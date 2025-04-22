@@ -1,14 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { CreateRelatorioDTO, UpdateRelatorioDTO } from 'src/relatorios/relatorio.dto';
+import {
+  CreateRelatorioDTO,
+  UpdateRelatorioDTO,
+} from 'src/relatorios/relatorio.dto';
 import { Relatorio, RelatorioDocument } from 'src/relatorios/relatorio.schema';
 import { PdfService } from './shared/pdf.service';
 
 @Injectable()
 export class RelatorioService {
   constructor(
-    @InjectModel('Relatorio') private readonly RelatorioModel: Model<RelatorioDocument>,
+    @InjectModel('Relatorio')
+    private readonly RelatorioModel: Model<RelatorioDocument>,
     private readonly pdfService: PdfService,
   ) {}
 
@@ -44,8 +48,7 @@ export class RelatorioService {
   }
 
   async findAll(): Promise<any[]> {
-    return this.RelatorioModel
-      .find()
+    return this.RelatorioModel.find()
       .populate('peritoAssinante', 'nome email')
       .populate({
         path: 'caseId',
@@ -57,13 +60,15 @@ export class RelatorioService {
   }
 
   async findbyCase(caseId: string): Promise<any[]> {
-    return this.RelatorioModel
-      .find({ caseId: caseId })
+    return this.RelatorioModel.find({ caseId: caseId })
       .populate('peritoAssinante', 'nome email')
       .exec();
   }
 
-  async update(id: string, updateRelatorioDTO: UpdateRelatorioDTO): Promise<Relatorio> {
+  async update(
+    id: string,
+    updateRelatorioDTO: UpdateRelatorioDTO,
+  ): Promise<Relatorio> {
     const updatedRelatorio = await this.RelatorioModel.findByIdAndUpdate(
       id,
       updateRelatorioDTO,
@@ -81,5 +86,11 @@ export class RelatorioService {
 
   async findOneById(id: string): Promise<Relatorio | null> {
     return this.RelatorioModel.findById(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    const result = await this.RelatorioModel.findByIdAndDelete(id);
+    if (!result)
+      throw new NotFoundException('Relatorio não encontrado para deletar');
   }
 }

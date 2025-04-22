@@ -40,7 +40,7 @@ export class LaudoController {
   }
 
   @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
-  @Get('evidencia/:id')
+  @Get('evidence/:id')
   async findByEvidencia(@Param('id') id: string) {
     return this.laudoService.findbyEvidencia(id);
   }
@@ -55,7 +55,7 @@ export class LaudoController {
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
-  @Patch('assinar/:id')
+  @Patch('sign/:id')
   async AssinarLaudo(
     @Param('id') id: string,
     @Body() { peritoId }: AssinarLaudoDTO,

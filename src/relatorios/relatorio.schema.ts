@@ -14,7 +14,7 @@ export class Relatorio extends Document {
   pdfUrl?: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Caso' })
-  evidenciaId: string;
+  caseId: string;
 
   @Prop({ default: false })
   assinado: boolean;

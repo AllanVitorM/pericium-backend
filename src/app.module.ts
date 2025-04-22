@@ -10,8 +10,7 @@ import { CaseModule } from './cases/case.module';
 import { EvidenciaModule } from './evidencias/evidencia.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { LaudoModule } from './laudos/laudo.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwtAuthGuard';
+import { RelatorioModule } from './relatorios/relatorio.module';
 
 @Module({
   imports: [
@@ -32,14 +31,9 @@ import { JwtAuthGuard } from './auth/jwtAuthGuard';
     CaseModule,
     EvidenciaModule,
     LaudoModule,
+    RelatorioModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -3,14 +3,14 @@ import {
   IsNotEmpty,
   IsEnum,
   IsOptional,
-  IsNumber,
+  MinLength,
 } from 'class-validator';
 import { Role } from 'src/common/enums/role.enum';
 
 export class CreateUserDTO {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  cpf: number;
+  cpf: string;
 
   @IsString()
   @IsNotEmpty()
@@ -21,8 +21,8 @@ export class CreateUserDTO {
   email: string;
 
   @IsString()
-  @IsNotEmpty()
-  password: string;
+  @IsOptional()
+  password?: string;
 
   @IsEnum(Role)
   role: Role;
@@ -46,4 +46,14 @@ export class AdminUpdateUserDTO {
   @IsString()
   @IsOptional()
   password?: string;
+}
+
+export class ChangePasswordDTO {
+  @IsString()
+  @MinLength(8)
+  oldPassword: string;
+
+  @IsString()
+  @MinLength(8)
+  newPassword: string;
 }

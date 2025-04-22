@@ -22,7 +22,7 @@ export class CaseController {
   constructor(private readonly CaseService: CaseService) {}
 
   @Roles(Role.ADMIN, Role.PERITO)
-  @Post()
+  @Post('createcase')
   async create(@Body() createCaseDTO: CreateCaseDTO) {
     return this.CaseService.create(createCaseDTO);
   }
