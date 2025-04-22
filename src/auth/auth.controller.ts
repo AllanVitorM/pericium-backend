@@ -1,27 +1,60 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Request,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDocument } from 'src/user/user.schema';
-import { jwtpayload } from './interfaces/jwt.interface';
+import { JwtAuthGuard } from './jwtAuthGuard';
+import { LocalAuthGuard } from './localAuthGuard';
+import { AuthenticatedRequest } from 'src/types/authenticatedRequest';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() body: { cpf: string; password: string }) {
-    const user: UserDocument | null = await this.authService.validateUser(
-      body.cpf,
-      body.password,
-    );
+  login(@Request() req: AuthenticatedRequest) {
+    console.log('🧪 req.user:', req.user);
+
+    const user = req.user;
 
     if (!user) {
       throw new UnauthorizedException('Usuário inválido!');
     }
-    const payload: jwtpayload = {
-      sub: user._id.toString(),
+
+    const payload = {
+      sub: user.id,
       cpf: user.cpf,
       role: user.role,
     };
-    return this.authService.login(payload);
+
+    const { access_token } = this.authService.login(payload);
+    console.log('Token gerado no backend:', access_token);
+
+    return { token: access_token, user };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getProfile(@Request() req: AuthenticatedRequest) {
+    const user: AuthenticatedRequest['user'] = req.user;
+
+    if (!user) {
+      throw new UnauthorizedException('Usuário não encontrado.');
+    }
+
+    console.log('👤 req.user no backend:', req.user);
+
+    return {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      cpf: user.cpf,
+      email: user.email,
+    };
   }
 }

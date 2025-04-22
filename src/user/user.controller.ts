@@ -4,7 +4,9 @@ import {
   Post,
   Get,
   Put,
+  Patch,
   Delete,
+  Request,
   Param,
 } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
@@ -12,12 +14,14 @@ import {
   AdminUpdateUserDTO,
   CreateUserDTO,
   UpdateUserDTO,
+  ChangePasswordDTO,
 } from 'src/user/user.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwtAuthGuard';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { AuthenticatedRequest } from 'src/types/authenticatedRequest';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
@@ -62,6 +66,20 @@ export class UserController {
     @Body() updateUserDTO: UpdateUserDTO,
   ) {
     return this.userService.update(cpf, updateUserDTO);
+  }
+
+  @Roles(Role.ADMIN, Role.PERITO)
+  @Patch('changepassword')
+  async changePassword(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: ChangePasswordDTO,
+  ) {
+    const { id } = req.user;
+    return this.userService.changePassword(
+      id,
+      body.oldPassword,
+      body.newPassword,
+    );
   }
 
   @Roles(Role.ADMIN)

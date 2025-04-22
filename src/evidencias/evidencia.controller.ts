@@ -29,8 +29,8 @@ import { Roles } from 'src/auth/roles.decorator';
 export class EvidenciaController {
   constructor(private readonly evidenciaService: EvidenciaService) {}
 
-  @Roles(Role.ADMIN, Role.PERITO)
-  @Post()
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Post('createevidence')
   @UseInterceptors(FileInterceptor('file')) // "file" é o nome do campo no form-data
   async createEvidencia(
     @Body() body: CreateEvidenciaDTO,
@@ -51,13 +51,13 @@ export class EvidenciaController {
     return this.evidenciaService.findOne(id);
   }
 
-  @Roles(Role.ADMIN, Role.PERITO)
-  @Patch(':id')
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Patch('update/:id')
   update(@Param('id') id: string, @Body() dto: updateEvidenciaDTO) {
     return this.evidenciaService.updateEvidencia(id, dto);
   }
 
-  @Roles(Role.ADMIN, Role.PERITO)
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.evidenciaService.remove(id);

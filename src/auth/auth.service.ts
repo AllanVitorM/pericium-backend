@@ -18,8 +18,14 @@ export class AuthService {
     password: string,
   ): Promise<UserDocument | null> {
     const user = await this.userModel.findOne({ cpf });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (isPasswordValid) {
+        return user;
+      } else {
+        return null;
+      }
     }
     return null;
   }
@@ -30,8 +36,9 @@ export class AuthService {
       cpf: user.cpf,
       role: user.role,
     };
+    const token = this.jwtservice.sign(payload);
     return {
-      access_token: this.jwtservice.sign(payload),
+      access_token: token,
     };
   }
 }
