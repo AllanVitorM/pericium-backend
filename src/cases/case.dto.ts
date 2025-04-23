@@ -22,6 +22,10 @@ export class CreateCaseDTO {
   @IsDateString()
   @IsNotEmpty()
   dataAbertura: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 }
 
 export class UpdateCaseDTO {
