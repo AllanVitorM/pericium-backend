@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import mongoose from 'mongoose';
 import { ValidationPipe } from '@nestjs/common';
+import { setupSwagger } from './swagger.config'; // ✅ aqui
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,9 @@ async function bootstrap() {
     origin: 'http://localhost:3000',
     credentials: true,
   });
+
+  setupSwagger(app); // ✅ aqui
+
   await app.listen(8000);
 }
 bootstrap();
