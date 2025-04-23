@@ -19,15 +19,22 @@ export class CaseService {
   }
 
   async findAll(): Promise<Caso[]> {
-    return this.caseModel.find().exec();
+    return this.caseModel.find().populate('userId', 'name').exec();
   }
 
   async findById(id: string): Promise<Caso | null> {
     return this.caseModel.findById(id).exec();
   }
 
-  async findOne(titulo: string): Promise<Caso | null> {
-    return this.caseModel.findOne({ titulo }).exec();
+  async findbyUser(userId: string): Promise<any[]> {
+    return this.caseModel
+      .find({ userId: userId })
+      .populate('userId', 'nome')
+      .exec();
+  }
+
+  async findOne(id: string): Promise<Caso | null> {
+    return this.caseModel.findOne({ id }).exec();
   }
 
   async findOneDataAbertura(start: Date, end: Date): Promise<Caso | null> {

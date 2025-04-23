@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import { Status } from 'src/common/enums/status.enum';
 
 export type CaseDocument = Caso & Document;
@@ -20,5 +20,8 @@ export class Caso {
 
   @Prop({ type: Date })
   dataFechamento?: Date;
+
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
+  userId: mongoose.Schema.Types.ObjectId;
 }
 export const CaseSchema = SchemaFactory.createForClass(Caso);
