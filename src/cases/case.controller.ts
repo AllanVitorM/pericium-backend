@@ -34,8 +34,8 @@ export class CaseController {
 
   @Roles(Role.ADMIN, Role.PERITO, Role.PERITO)
   @Get(':id')
-  async findOne(@Param('titulo') titulo: string) {
-    return this.CaseService.findOne(titulo);
+  async findOneById(@Param('id') id: string) {
+    return this.CaseService.findById(id);
   }
 
   @Roles(Role.ADMIN, Role.PERITO, Role.PERITO)

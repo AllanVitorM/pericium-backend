@@ -22,10 +22,6 @@ export class CaseService {
     return this.caseModel.find().populate('userId', 'name').exec();
   }
 
-  async findById(id: string): Promise<Caso | null> {
-    return this.caseModel.findById(id).exec();
-  }
-
   async findbyUser(userId: string): Promise<any[]> {
     return this.caseModel
       .find({ userId: userId })
@@ -33,8 +29,8 @@ export class CaseService {
       .exec();
   }
 
-  async findOne(id: string): Promise<Caso | null> {
-    return this.caseModel.findOne({ id }).exec();
+  async findById(id: string): Promise<Caso | null> {
+    return this.caseModel.findById(id).exec();
   }
 
   async findOneDataAbertura(start: Date, end: Date): Promise<Caso | null> {
