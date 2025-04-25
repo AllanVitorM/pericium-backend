@@ -58,6 +58,7 @@ export class LaudoController {
   @ApiOperation({ summary: 'Buscar laudo por evidência (ID)' })
   @ApiParam({ name: 'id', required: true })
   async findByEvidencia(@Param('id') id: string) {
+    console.log('ID recebido no endpoint /evidence/:id =>', id);
     return this.laudoService.findbyEvidencia(id);
   }
 

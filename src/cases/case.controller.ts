@@ -53,8 +53,8 @@ export class CaseController {
   @ApiOperation({ summary: 'Buscar caso por ID' })
   @ApiParam({ name: 'id', description: 'ID do caso' })
   @ApiResponse({ status: 200, description: 'Caso encontrado' })
-  async findOne(@Param('id') id: string) {
-    return this.CaseService.findOne(id);
+  async findOneById(@Param('id') id: string) {
+    return this.CaseService.findById(id);
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
