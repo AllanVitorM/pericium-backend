@@ -87,6 +87,14 @@ export class EvidenciaController {
   }
 
   @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Get('bycase/:caseId')
+  @ApiOperation({ summary: 'Listar evidências por ID do caso' })
+  @ApiParam({ name: 'caseId', required: true })
+  findByCaseId(@Param('caseId') caseId: string) {
+    return this.evidenciaService.findByCaseId(caseId);
+  }
+
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
   @Patch('update/:id')
   @ApiOperation({ summary: 'Atualizar dados da evidência' })
   @ApiParam({ name: 'id', required: true })
