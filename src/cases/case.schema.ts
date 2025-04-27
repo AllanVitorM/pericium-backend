@@ -4,7 +4,7 @@ import { Status } from 'src/common/enums/status.enum';
 
 export type CaseDocument = Caso & Document;
 
-@Schema()
+@Schema({ collection: 'cases' })
 export class Caso {
   @Prop({ required: true })
   titulo: string;
