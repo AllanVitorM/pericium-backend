@@ -3,8 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Role } from 'src/common/enums/role.enum';
 
-
-
 @Schema()
 export class User extends Document {
     
