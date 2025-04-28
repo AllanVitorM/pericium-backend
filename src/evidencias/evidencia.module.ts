@@ -16,5 +16,6 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
   ],
   controllers: [EvidenciaController],
   providers: [EvidenciaService],
+  exports: [MongooseModule],
 })
 export class EvidenciaModule {}

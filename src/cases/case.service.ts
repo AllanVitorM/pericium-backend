@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Caso, CaseDocument } from 'src/cases/case.schema';
+import { Caso } from 'src/cases/case.schema';
 import { CreateCaseDTO, UpdateCaseDTO } from 'src/cases/case.dto';
 import { Status } from 'src/common/enums/status.enum';
 
 @Injectable()
 export class CaseService {
-  constructor(@InjectModel('Case') private caseModel: Model<CaseDocument>) {}
+  constructor(@InjectModel('Case') private readonly caseModel: Model<Caso>) {}
 
   async create(createCaseDTO: CreateCaseDTO): Promise<Caso> {
     const newCase = new this.caseModel(createCaseDTO);

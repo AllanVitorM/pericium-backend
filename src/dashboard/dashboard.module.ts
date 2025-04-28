@@ -1,11 +1,18 @@
 import { Module } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
-import { DashboardController } from './dashboard.controller';
-import { CaseModule } from '../cases/case.module'; // <-- importa o módulo do case
+import { CaseModule } from 'src/cases/case.module';
+import { LaudoModule } from 'src/laudos/laudo.module';
+import { EvidenciaModule } from 'src/evidencias/evidencia.module';
+import { DashboardController } from './dashboard.controller'; // Importe o módulo do modelo Evidencia
 
 @Module({
-  imports: [CaseModule],
+  imports: [
+    CaseModule,
+    LaudoModule,
+    EvidenciaModule, // Certifique-se de importar o módulo do Evidencia
+  ],
   controllers: [DashboardController],
   providers: [DashboardService],
+
 })
 export class DashboardModule {}
