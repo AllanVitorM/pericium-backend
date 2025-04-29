@@ -2,22 +2,29 @@ import {
   Controller,
   Post,
   Get,
+  Put,
+  Body,
   Request,
   UnauthorizedException,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwtAuthGuard';
 import { LocalAuthGuard } from './localAuthGuard';
 import { AuthenticatedRequest } from 'src/types/authenticatedRequest';
-
-// 🔽 Swagger
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+
+// ✅ DTO declarada FORA do controller
+export class UpdatePasswordDto {
+  oldPassword: string;
+  newPassword: string;
+}
 
 @ApiTags('Autenticação')
 @Controller('auth')
@@ -30,8 +37,6 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Login realizado com sucesso' })
   @ApiResponse({ status: 401, description: 'Usuário inválido' })
   login(@Request() req: AuthenticatedRequest) {
-    console.log('🧪 req.user:', req.user);
-
     const user = req.user;
 
     if (!user) {
@@ -45,8 +50,6 @@ export class AuthController {
     };
 
     const { access_token } = this.authService.login(payload);
-    console.log('Token gerado no backend:', access_token);
-
     return { token: access_token, user };
   }
 
@@ -63,8 +66,6 @@ export class AuthController {
       throw new UnauthorizedException('Usuário não encontrado.');
     }
 
-    console.log('👤 req.user no backend:', req.user);
-
     return {
       id: user.id,
       name: user.name,
@@ -72,5 +73,29 @@ export class AuthController {
       cpf: user.cpf,
       email: user.email,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('update-password')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualizar senha do usuário autenticado' })
+  @ApiResponse({ status: 200, description: 'Senha atualizada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Senha atual incorreta' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  async updatePassword(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: UpdatePasswordDto,
+  ) {
+    const user = req.user;
+
+    if (!user) {
+      throw new UnauthorizedException('Usuário não encontrado.');
+    }
+
+    const { oldPassword, newPassword } = body;
+
+    await this.authService.updatePassword(user.id, oldPassword, newPassword);
+
+    return { message: 'Senha atualizada com sucesso.' };
   }
 }
