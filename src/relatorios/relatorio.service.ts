@@ -7,6 +7,8 @@ import {
 } from 'src/relatorios/relatorio.dto';
 import { Relatorio, RelatorioDocument } from 'src/relatorios/relatorio.schema';
 import { PdfService } from './shared/pdf.service';
+import { CaseDocument } from 'src/cases/case.schema';
+import { Status } from 'src/common/enums/status.enum';
 
 @Injectable()
 export class RelatorioService {
@@ -14,37 +16,29 @@ export class RelatorioService {
     @InjectModel('Relatorio')
     private readonly RelatorioModel: Model<RelatorioDocument>,
     private readonly pdfService: PdfService,
+    @InjectModel('Case')
+    private readonly casoModel: Model<CaseDocument>,
   ) {}
 
   async create(CreateRelatorioDTO: CreateRelatorioDTO): Promise<Relatorio> {
-    const createdRelatorio = new this.RelatorioModel(CreateRelatorioDTO);
+    const createdRelatorio = new this.RelatorioModel({
+      ...CreateRelatorioDTO,
+      assinado: true,
+      dataAssinatura: new Date(),
+      peritoAssinante: new Types.ObjectId(CreateRelatorioDTO.userId),
+    });
+
     await createdRelatorio.save();
 
     const pdfUrl = await this.pdfService.gerarRelatorioPDF(createdRelatorio);
-
     createdRelatorio.pdfUrl = pdfUrl;
-    return createdRelatorio.save();
-  }
+    await createdRelatorio.save();
 
-  async AssinarRelatorio(id: string, peritoId: string): Promise<Relatorio> {
-    const Relatorio = await this.RelatorioModel.findById(id);
-    if (!Relatorio) {
-      throw new NotFoundException(`Relatório com ID ${id} não encontrado`);
-    }
-    if (Relatorio.assinado) {
-      throw new Error('Este relatório já foi assinado.');
+    if (CreateRelatorioDTO.caseId) {
+      await this.fecharCaso(CreateRelatorioDTO.caseId);
     }
 
-    Relatorio.assinado = true;
-    Relatorio.dataAssinatura = new Date();
-    Relatorio.peritoAssinante = new Types.ObjectId(peritoId);
-
-    await Relatorio.populate('peritoAssinante', 'name');
-
-    const pdfUrl = await this.pdfService.gerarRelatorioPDF(Relatorio);
-    Relatorio.pdfUrl = pdfUrl;
-
-    return Relatorio.save();
+    return createdRelatorio;
   }
 
   async findAll(): Promise<any[]> {
@@ -92,5 +86,14 @@ export class RelatorioService {
     const result = await this.RelatorioModel.findByIdAndDelete(id);
     if (!result)
       throw new NotFoundException('Relatorio não encontrado para deletar');
+  }
+
+  async fecharCaso(caseId: string) {
+    const caso = await this.casoModel.findById(caseId);
+    if (!caso) {
+      throw new NotFoundException(`Caso não encontrado ${caseId}`);
+    }
+    caso.status = Status.CONCLUIDO;
+    await caso.save();
   }
 }

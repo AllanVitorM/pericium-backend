@@ -42,9 +42,7 @@ export class DashboardService {
     });
 
     const percentualEvidenciasComLaudo =
-      totalEvidencias > 0
-        ? ((totalEvidencias - evidenciasSemLaudo) / totalEvidencias) * 100
-        : 0;
+      totalEvidencias > 0 ? (totalEvidencias / totalEvidencias) * 100 : 0;
 
     // AGREGGAÇÃO POR MÊS
     const casosPorMes: CasosPorMes[] = await this.caseModel.aggregate([

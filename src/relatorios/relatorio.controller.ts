@@ -77,25 +77,6 @@ export class RelatorioController {
     return this.RelatorioService.update(id, updateRelatorioDTO);
   }
 
-  @Patch('sign/:id')
-  @Roles(Role.ADMIN, Role.PERITO)
-  @ApiOperation({ summary: 'Assinar relatório por ID' })
-  @ApiParam({ name: 'id', required: true, description: 'ID do relatório' })
-  @ApiBody({ type: AssinarRelatorioDTO })
-  @ApiResponse({ status: 200, description: 'Relatório assinado com sucesso' })
-  async AssinarRelatorio(
-    @Param('id') id: string,
-    @Body() { peritoId }: AssinarRelatorioDTO,
-  ) {
-    const Relatorio = await this.RelatorioService.findOneById(id);
-
-    if (!Relatorio) throw new NotFoundException('Relatório não encontrado.');
-
-    if (Relatorio.assinado) throw new Error('Relatório já assinado');
-
-    return this.RelatorioService.AssinarRelatorio(id, peritoId);
-  }
-
   @Delete(':id')
   @Roles(Role.ADMIN, Role.PERITO)
   @ApiOperation({ summary: 'Remover relatório por ID' })
