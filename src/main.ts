@@ -8,7 +8,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  const port = process.env.PORT || 4000;
   const dbConnection = mongoose.connection;
   dbConnection.on('error', (err) => {
     console.log('Falha ao conectar ao mongoDb', err);
@@ -36,6 +36,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); // Acesse em http://localhost:8000/api
 
-  await app.listen(process.env.PORT || 8000);
+  await app.listen(port, () => {
+    console.log('FUNCIOnaaaaa');
+  });
 }
 bootstrap();
