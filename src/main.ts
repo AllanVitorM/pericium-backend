@@ -8,7 +8,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 8000;
   const dbConnection = mongoose.connection;
   dbConnection.on('error', (err) => {
     console.log('Falha ao conectar ao mongoDb', err);
@@ -20,11 +20,20 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('API Swagger')
+      .setDescription('Documentação da API')
+      .setVersion('1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document); // Disponível em /api
+  }
+
   app.enableCors({
     origin: 'https://pericium.vercel.app',
     credentials: true,
   });
-  console.log('CORS habilitado para https://pericium.vercel.app');
 
   // 🔽 Configuração do Swagger
   const config = new DocumentBuilder()
