@@ -20,6 +20,16 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('API Swagger')
+      .setDescription('Documentação da API')
+      .setVersion('1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document); // Disponível em /api
+  }
+
   app.enableCors({
     origin: 'http://localhost:3000',
     credentials: true,
