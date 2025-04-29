@@ -6,9 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "tsc",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "node --max-old-space-size=4096 dist/main.js",
+    "start": "nest start --port $port",
     "start:dev": "npm install -g @nestjs/cli && nest build",
     "start:debug": "nest start --debug --watch",
     "start:prod": "dist/main",
