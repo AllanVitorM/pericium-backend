@@ -9,7 +9,6 @@ import { Role } from 'src/common/enums/role.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDTO {
-  
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

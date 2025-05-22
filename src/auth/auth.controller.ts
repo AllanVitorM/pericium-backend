@@ -7,7 +7,6 @@ import {
   Request,
   UnauthorizedException,
   UseGuards,
-  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwtAuthGuard';
