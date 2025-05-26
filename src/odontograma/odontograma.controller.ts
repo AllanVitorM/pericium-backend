@@ -45,18 +45,20 @@ export class OdontogramaController {
     return this.odontogramaService.findAll();
   }
 
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Get('vitima/:vitimaId')
+  @ApiOperation({ summary: 'Listar odontograma por ID de Vitima' })
+  @ApiParam({ name: 'vitimaId', required: true })
+  findByVitimaId(@Param('vitimaId') vitimaId: string) {
+    return this.odontogramaService.findByVitimaId(vitimaId);
+  }
+
   @Roles(Role.ADMIN, Role.PERITO)
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar um odontograma' })
   @ApiParam({ name: 'id', description: 'ID do odontograma' })
   @ApiResponse({ status: 200, description: 'Odontograma deletada com sucesso' })
   async deleteOdontograma(@Param('id') id: string) {
-    const wasDeleted = (await this.odontogramaService.findOneById(id)) === null;
-
-    if (wasDeleted) {
-      return { message: `Odontograma ${id} foi evaporada com sucesso!` };
-    } else {
-      return { message: `Odontograma ${id} deu fuga com sucesso!` };
-    }
+    return this.odontogramaService.remove(id);
   }
 }

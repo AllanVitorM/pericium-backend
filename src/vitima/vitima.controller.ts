@@ -3,12 +3,13 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
   Delete,
   Param,
   UseGuards,
 } from '@nestjs/common';
 import { VitimaService } from './vitima.service';
-import { CreateVitimaDTO } from './vitima.dto';
+import { CreateVitimaDTO, UpdateVitimaDTO } from './vitima.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { JwtAuthGuard } from 'src/auth/jwtAuthGuard';
@@ -30,7 +31,7 @@ import {
 export class VitimaController {
   constructor(private readonly vitimaService: VitimaService) {}
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.PERITO)
   @Post('createvitima')
   @ApiOperation({ summary: 'Criar uma nova vitima' })
   @ApiResponse({ status: 201, description: 'Vítima criada com sucesso' })
@@ -38,7 +39,7 @@ export class VitimaController {
     return this.vitimaService.create(createVitimaDTO);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
   @Get()
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiResponse({ status: 200, description: 'Lista de vítimas retornada' })
@@ -47,12 +48,28 @@ export class VitimaController {
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
-  @Get(':name')
-  @ApiOperation({ summary: 'Buscar usuário por nome' })
-  @ApiParam({ name: 'name', description: 'Nome do usuário' })
+  @Get(':id')
+  @ApiOperation({ summary: 'Buscar usuário por ID' })
+  @ApiParam({ name: 'id', required: true })
   @ApiResponse({ status: 200, description: 'Usuário encontrado por nome' })
-  async findOne(@Param('name') name: string) {
-    return this.vitimaService.findOneById(name);
+  async findOne(@Param('id') id: string) {
+    return this.vitimaService.findOneById(id);
+  }
+
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Get('bycase/:caseId')
+  @ApiOperation({ summary: 'Listar evidências por ID do caso' })
+  @ApiParam({ name: 'caseId', required: true })
+  findByCaseId(@Param('caseId') caseId: string) {
+    return this.vitimaService.findByCaseId(caseId);
+  }
+
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Patch('update/:id')
+  @ApiOperation({ summary: 'Atualizar dados da evidência' })
+  @ApiParam({ name: 'id', required: true })
+  update(@Param('id') id: string, @Body() dto: UpdateVitimaDTO) {
+    return this.vitimaService.updateVitima(id, dto);
   }
 
   @Roles(Role.ADMIN, Role.PERITO)

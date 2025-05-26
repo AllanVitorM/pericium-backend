@@ -6,13 +6,8 @@ import { EvidenciaModule } from 'src/evidencias/evidencia.module';
 import { DashboardController } from './dashboard.controller'; // Importe o módulo do modelo Evidencia
 
 @Module({
-  imports: [
-    CaseModule,
-    LaudoModule,
-    EvidenciaModule, // Certifique-se de importar o módulo do Evidencia
-  ],
+  imports: [CaseModule, LaudoModule, EvidenciaModule],
   controllers: [DashboardController],
   providers: [DashboardService],
-
 })
 export class DashboardModule {}

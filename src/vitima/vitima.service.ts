@@ -1,4 +1,4 @@
-import { CreateVitimaDTO } from './vitima.dto';
+import { CreateVitimaDTO, UpdateVitimaDTO } from './vitima.dto';
 import { Vitima, VitimaDocument } from './vitima.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -17,10 +17,28 @@ export class VitimaService {
   }
 
   async findAll(): Promise<Vitima[]> {
-    return this.vitimaModel.find();
+    return this.vitimaModel.find().populate('caseId').exec();
   }
   async findOneById(id: string): Promise<Vitima | null> {
-    return this.vitimaModel.findById(id);
+    const vitima = await this.vitimaModel
+      .findById(id)
+      .populate('caseId')
+      .exec();
+    if (!vitima) throw new NotFoundException('Vitima não encontrada!');
+    return vitima;
+  }
+
+  async findByCaseId(caseId: string): Promise<Vitima[]> {
+    return this.vitimaModel.find({ caseId }).populate('caseId').exec();
+  }
+
+  async updateVitima(id: string, dto: UpdateVitimaDTO): Promise<Vitima> {
+    const update = await this.vitimaModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!update)
+      throw new NotFoundException('Vitima não encontrada para atualização!');
+    return update;
   }
 
   async remove(id: string): Promise<void> {

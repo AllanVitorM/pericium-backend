@@ -1,5 +1,5 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 
 export type OdontogramaDocument = Odontograma & Document & { _id: string };
 
@@ -10,6 +10,9 @@ export class Odontograma extends Document {
 
   @Prop()
   observacoes: string;
+
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Vitima' })
+  vitimaId: mongoose.Schema.Types.ObjectId;
 }
 
 export const OdontogramaSchema = SchemaFactory.createForClass(Odontograma);
