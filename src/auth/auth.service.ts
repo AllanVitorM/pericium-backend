@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtpayload } from './interfaces/jwt.interface';
 import { Model } from 'mongoose';
@@ -23,8 +27,6 @@ export class AuthService {
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
         return user;
-      } else {
-        return null;
       }
     }
     return null;
@@ -40,5 +42,30 @@ export class AuthService {
     return {
       access_token: token,
     };
+  }
+
+  async updatePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('Usuário não encontrado.');
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Senha atual incorreta.');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedNewPassword;
+    await user.save();
+
+    return { message: 'Senha atualizada com sucesso.' };
   }
 }

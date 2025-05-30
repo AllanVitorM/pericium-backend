@@ -11,6 +11,9 @@ import { EvidenciaModule } from './evidencias/evidencia.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { LaudoModule } from './laudos/laudo.module';
 import { RelatorioModule } from './relatorios/relatorio.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { VitimaModule } from './vitima/vitima.module';
+import { OdontogramaModule } from './odontograma/odontograma.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { RelatorioModule } from './relatorios/relatorio.module';
     EvidenciaModule,
     LaudoModule,
     RelatorioModule,
+    DashboardModule,
+    VitimaModule,
+    OdontogramaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -80,7 +80,7 @@ export class EvidenciaService {
   }
 
   async findByCaseId(caseId: string): Promise<Evidencia[]> {
-    return this.evidenciaModel.find({ caseId }).populate('caseId').exec()
+    return this.evidenciaModel.find({ caseId }).populate('caseId').exec();
   }
 
   async updateEvidencia(
