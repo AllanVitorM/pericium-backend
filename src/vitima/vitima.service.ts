@@ -19,12 +19,10 @@ export class VitimaService {
   async findAll(): Promise<Vitima[]> {
     return this.vitimaModel.find().populate('caseId').exec();
   }
+
   async findOneById(id: string): Promise<Vitima | null> {
-    const vitima = await this.vitimaModel
-      .findById(id)
-      .populate('caseId')
-      .exec();
-    if (!vitima) throw new NotFoundException('Vitima não encontrada!');
+    const vitima = await this.vitimaModel.findById(id).populate('caseId').exec();
+    if (!vitima) throw new NotFoundException('Vítima não encontrada!');
     return vitima;
   }
 
@@ -37,14 +35,14 @@ export class VitimaService {
       new: true,
     });
     if (!update)
-      throw new NotFoundException('Vitima não encontrada para atualização!');
+      throw new NotFoundException('Vítima não encontrada para atualização!');
     return update;
   }
 
   async remove(id: string): Promise<void> {
     const result = await this.vitimaModel.findByIdAndDelete(id);
     if (!result) {
-      throw new NotFoundException(`Vitima com ID ${id} não encontrada`);
+      throw new NotFoundException(`Vítima com ID ${id} não encontrada`);
     }
   }
 }
