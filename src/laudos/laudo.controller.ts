@@ -62,6 +62,20 @@ export class LaudoController {
     return this.laudoService.findbyEvidencia(id);
   }
 
+  @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
+  @Get('pdf/evidencia/:evidenciaId')
+  @ApiOperation({ summary: 'Buscar laudo por ID' })
+  @ApiParam({ name: 'id', required: true })
+  async getPdf(@Param('evidenciaId') evidenciaId: string) {
+    const laudo = await this.laudoService.findbyEvidenciaId(evidenciaId);
+
+    if (!laudo?.pdfUrl) {
+      throw new NotFoundException('pdf não encontrado');
+    }
+
+    return { pdfUrl: laudo.pdfUrl };
+  }
+
   @Roles(Role.ADMIN, Role.PERITO)
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar dados do laudo' })

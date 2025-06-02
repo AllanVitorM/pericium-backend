@@ -63,6 +63,10 @@ export class LaudoService {
       .exec();
   }
 
+  async findbyEvidenciaId(evidenciaId: string) {
+    return this.laudoModel.findOne({ evidenciaId });
+  }
+
   async update(id: string, updateLaudoDTO: UpdateLaudoDTO): Promise<Laudo> {
     const updatedLaudo = await this.laudoModel.findByIdAndUpdate(
       id,
