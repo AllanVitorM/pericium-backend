@@ -66,18 +66,33 @@ export class UserService {
   ): Promise<User | null> {
     const user = await this.userModel.findOne({ cpf });
 
-    if (!user) return null;
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
 
-    if (
-      'password' in data &&
-      data.password &&
-      data.password !== user.password
-    ) {
+    const novoCpf = data.cpf ?? cpf;
+
+    // Se está alterando o CPF, verifica se o novo já está em uso por outro usuário
+    if (novoCpf !== cpf) {
+      const cpfExists = await this.userModel.findOne({ cpf: novoCpf });
+
+      if (cpfExists && cpfExists._id.toString() !== user._id.toString()) {
+        throw new BadRequestException('CPF já cadastrado por outro usuário.');
+      }
+    }
+
+    // Se estiver alterando a senha
+    if (data.password && data.password !== user.password) {
       const salt = await bcrypt.genSalt(10);
       data.password = await bcrypt.hash(data.password, salt);
     }
 
-    return this.userModel.findOneAndUpdate({ cpf }, data, { new: true }).exec();
+    // Atualiza os dados usando o _id do usuário
+    const updated = await this.userModel
+      .findByIdAndUpdate(user._id, data, { new: true })
+      .exec();
+
+    return updated;
   }
 
   async changePassword(
