@@ -37,6 +37,11 @@ export class UpdateUserDTO {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  cpf?: string; // Adicionado
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
   email?: string;
 
   @ApiProperty()
@@ -46,6 +51,11 @@ export class UpdateUserDTO {
 }
 
 export class AdminUpdateUserDTO {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  cpf?: string; // Adicionado
+
   @ApiProperty()
   @IsString()
   @IsOptional()
