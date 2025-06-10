@@ -8,7 +8,7 @@ export class Laudo extends Document {
   title: string;
 
   @Prop()
-  description?: string;
+  conteudo?: string;
 
   @Prop()
   pdfUrl?: string;

@@ -4,12 +4,18 @@ import { Model, Types } from 'mongoose';
 import { CreateLaudoDTO, UpdateLaudoDTO } from 'src/laudos/laudo.dto';
 import { Laudo, LaudoDocument } from 'src/laudos/laudo.schema';
 import { PdfService } from './shared/pdf.service';
+import { EvidenciaService } from 'src/evidencias/evidencia.service';
+import { GeminiService } from 'src/gemini/gemini.service';
+import { ReplicateService } from 'src/replicate/replicate.service';
 
 @Injectable()
 export class LaudoService {
   constructor(
     @InjectModel('Laudo') private readonly laudoModel: Model<LaudoDocument>,
     private readonly pdfService: PdfService,
+    private readonly evidenciaService: EvidenciaService,
+    private readonly geminiService: GeminiService,
+    private readonly replicateService: ReplicateService,
   ) {}
 
   async create(CreateLaudoDTO: CreateLaudoDTO): Promise<Laudo> {
@@ -20,6 +26,54 @@ export class LaudoService {
 
     createdLaudo.pdfUrl = pdfUrl;
     return createdLaudo.save();
+  }
+
+  async gerarLaudoPorEvidencia(evidenciaId: string): Promise<Laudo> {
+    const evidencia = await this.evidenciaService.findOne(evidenciaId);
+    if (!evidencia) {
+      throw new NotFoundException('Evidência não encontrada');
+    }
+
+    let descricaoImagem = '';
+    if (evidencia.imageUrl) {
+      try {
+        descricaoImagem = await this.replicateService.descreverImagem(
+          evidencia.imageUrl,
+        );
+      } catch (err) {
+        console.warn(
+          'Falha ao gerar descrição da imagem com Replicate:',
+          err.message,
+        );
+      }
+    }
+
+    const textoLaudo = await this.geminiService.gerarLaudo({
+      title: evidencia.title ?? 'Título não informado',
+      description: evidencia.description ?? 'Descrição não informada',
+      tipo: evidencia.tipo ?? 'Tipo não informado',
+      local: evidencia.local ?? 'Local não informado',
+      dateRegister: evidencia.dateRegister.toISOString(),
+      imageUrl: evidencia.imageUrl ?? '',
+      descricaoImagem, // novo campo!
+    });
+
+    const laudo = new this.laudoModel({
+      evidenciaId: evidencia._id,
+      title: evidencia.title,
+      description: evidencia.description,
+      tipo: evidencia.tipo,
+      local: evidencia.local,
+      conteudo: textoLaudo,
+      assinado: false,
+    });
+
+    await laudo.save();
+
+    const pdfUrl = await this.pdfService.gerarLaudoPDF(laudo);
+    laudo.pdfUrl = pdfUrl;
+
+    return laudo.save();
   }
 
   async AssinarLaudo(id: string, peritoId: string): Promise<Laudo> {
@@ -64,7 +118,13 @@ export class LaudoService {
   }
 
   async findbyEvidenciaId(evidenciaId: string) {
-    return this.laudoModel.findOne({ evidenciaId });
+    const objectId = new Types.ObjectId(evidenciaId);
+    console.log('Buscando laudo com evidenciaId ObjectId:', objectId);
+    const laudo = await this.laudoModel
+      .findOne({ evidenciaId: objectId })
+      .exec();
+
+    return laudo;
   }
 
   async update(id: string, updateLaudoDTO: UpdateLaudoDTO): Promise<Laudo> {

@@ -10,8 +10,8 @@ export class CreateLaudoDTO {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  descricao: string;
-  
+  conteudo: string;
+
   @ApiProperty()
   @IsString()
   @IsOptional()

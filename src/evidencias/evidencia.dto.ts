@@ -63,4 +63,9 @@ export class updateEvidenciaDTO {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  userId?: string;
 }

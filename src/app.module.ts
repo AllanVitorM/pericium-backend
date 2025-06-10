@@ -14,6 +14,7 @@ import { RelatorioModule } from './relatorios/relatorio.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { VitimaModule } from './vitima/vitima.module';
 import { OdontogramaModule } from './odontograma/odontograma.module';
+import { GeminiModule } from './gemini/gemini.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { OdontogramaModule } from './odontograma/odontograma.module';
     DashboardModule,
     VitimaModule,
     OdontogramaModule,
+    GeminiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

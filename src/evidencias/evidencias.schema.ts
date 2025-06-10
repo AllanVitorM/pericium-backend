@@ -24,6 +24,9 @@ export class Evidencia extends Document {
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Case' })
   caseId: string;
+
+  @Prop({ required: false, type: Types.ObjectId, ref: 'User' })
+  userId: string;
 }
 
 export const EvidenciaSchema = SchemaFactory.createForClass(Evidencia);

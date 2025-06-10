@@ -7,49 +7,70 @@ import { Laudo } from '../laudo.schema';
 @Injectable()
 export class PdfService {
   async gerarLaudoPDF(laudo: Laudo): Promise<string> {
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ margin: 50 });
     const buffers: Uint8Array[] = [];
 
+    // Captura do buffer
     doc.on('data', (chunk: Uint8Array) => buffers.push(chunk));
 
-    // Título
+    // Rodapé com numeração de páginas
+    const addFooter = () => {
+      const range = doc.bufferedPageRange(); // { start: 0, count: 1 }
+      for (let i = range.start; i < range.start + range.count; i++) {
+        doc.switchToPage(i);
+        doc.fontSize(9)
+          .fillColor('gray')
+          .text(`Página ${i + 1} de ${range.count}`, 50, doc.page.height - 50, {
+            align: 'center',
+          });
+      }
+    };
+
+    // Cabeçalho institucional
     doc
-      .font('Times-Bold')
-      .fontSize(22)
-      .text('LAUDO PERICIAL TÉCNICO', { align: 'center' })
+      .image('src/assets/logo.png', 50, 40, { width: 70 }) // Se houver logotipo, opcional
+      .fontSize(16)
+      .font('Helvetica-Bold')
+      .text('Instituto de Perícia Técnica e Criminalística', 130, 50, {
+        align: 'center',
+      })
       .moveDown(2);
 
-    // Cabeçalho
+    // Informações do laudo
     doc
       .fontSize(12)
-      .font('Times-Roman')
-      .text(`Nº do Laudo: ${laudo._id}`, { align: 'left' })
-      .text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`)
-      .moveDown();
+      .font('Helvetica')
+      .text(`Número do Laudo: ${laudo.id}`, { continued: true })
+      .text(`   |   Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`)
+      .moveDown(1.5);
 
-    // Seção: Título
+    // Título do documento
     doc
-      .font('Times-Bold')
       .fontSize(14)
-      .text('Título:', { underline: true })
-      .moveDown(0.2)
-      .font('Times-Roman')
+      .font('Helvetica-Bold')
+      .text('Laudo Técnico Pericial', { align: 'center', underline: true })
+      .moveDown(2);
+
+    // Título da evidência (se separado)
+    doc
       .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Título da Evidência:')
+      .moveDown(0.3)
+      .font('Helvetica')
       .text(laudo.title)
       .moveDown();
 
-    // Seção: Descrição
+    // Conteúdo gerado (laudo técnico real)
     doc
-      .font('Times-Bold')
-      .fontSize(14)
-      .text('Descrição:', { underline: true })
-      .moveDown(0.2)
-      .font('Times-Roman')
       .fontSize(12)
-      .text(laudo.description || 'Sem descrição disponível')
+      .font('Helvetica')
+      .text(laudo.conteudo || 'Sem conteúdo disponível', {
+        align: 'justify',
+      })
       .moveDown(2);
 
-    // Assinatura
+    // Assinatura (se disponível)
     if (laudo.assinado && laudo.peritoAssinante && laudo.dataAssinatura) {
       const nomePerito =
         typeof laudo.peritoAssinante === 'object' &&
@@ -58,19 +79,23 @@ export class PdfService {
           : 'Perito Desconhecido';
 
       doc
-        .font('Times-Roman')
+        .moveDown(4)
+        .font('Helvetica')
         .fontSize(12)
-        .text(`${nomePerito}`, { align: 'center' })
+        .text(nomePerito as string, { align: 'center' })
         .text('____________________________________', { align: 'center' })
         .text(
-          `Assinado em: ${new Date(laudo.dataAssinatura).toLocaleDateString('pt-BR')}`,
-          {
-            align: 'center',
-          },
+          `Assinado em: ${new Date(laudo.dataAssinatura).toLocaleDateString(
+            'pt-BR',
+          )}`,
+          { align: 'center' },
         );
     }
 
     doc.end();
+
+    // Adiciona rodapé ao finalizar
+    doc.on('end', () => addFooter());
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       doc.on('end', () => resolve(Buffer.concat(buffers)));
@@ -79,13 +104,14 @@ export class PdfService {
       );
     });
 
+    // Upload no Cloudinary
     const uploadResult: UploadApiResponse = await new Promise(
       (resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             resource_type: 'raw',
             folder: 'laudos',
-            public_id: `laudo-${laudo._id}`,
+            public_id: `laudo-${laudo.id}`,
             format: 'pdf',
           },
           (err, result) => {
@@ -93,10 +119,11 @@ export class PdfService {
             resolve(result as UploadApiResponse);
           },
         );
-        const readSteam = streamifier.createReadStream(buffer);
-        readSteam.pipe(stream);
+        const readStream = streamifier.createReadStream(buffer);
+        readStream.pipe(stream);
       },
     );
+
     return uploadResult.secure_url;
   }
 }

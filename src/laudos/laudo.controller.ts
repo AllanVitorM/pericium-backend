@@ -9,6 +9,7 @@ import {
   Patch,
   NotFoundException,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 import { LaudoService } from './laudo.service';
 import {
@@ -21,6 +22,7 @@ import { JwtAuthGuard } from 'src/auth/jwtAuthGuard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role } from 'src/common/enums/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
+import { Response } from 'express';
 
 // 🔽 Swagger imports
 import {
@@ -65,7 +67,7 @@ export class LaudoController {
   @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
   @Get('pdf/evidencia/:evidenciaId')
   @ApiOperation({ summary: 'Buscar laudo por ID' })
-  @ApiParam({ name: 'id', required: true })
+  @ApiParam({ name: 'evidenciaId', required: true })
   async getPdf(@Param('evidenciaId') evidenciaId: string) {
     const laudo = await this.laudoService.findbyEvidenciaId(evidenciaId);
 

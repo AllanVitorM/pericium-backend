@@ -6,7 +6,7 @@ export type VitimaDocument = Vitima & Document & { _id: string };
 
 @Schema()
 export class Vitima extends Document {
-  @Prop({ required: true })
+  @Prop()
   NIC: string;
 
   @Prop({ required: true })
