@@ -9,6 +9,12 @@ export class Odontograma extends Document {
   dentes: string;
 
   @Prop()
+  tipodente: string;
+  
+  @Prop()
+  imageUrl?: string;
+
+  @Prop()
   observacoes: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Vitima' })

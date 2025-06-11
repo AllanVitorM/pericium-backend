@@ -14,7 +14,7 @@ export class Laudo extends Document {
   pdfUrl?: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Evidencia' })
-  evidenciaId: string;
+  evidenciaId: Types.ObjectId;
 
   @Prop({ default: false })
   assinado: boolean;

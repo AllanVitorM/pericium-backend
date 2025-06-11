@@ -120,13 +120,19 @@ export class LaudoService {
   async findbyEvidenciaId(evidenciaId: string) {
     const objectId = new Types.ObjectId(evidenciaId);
     console.log('Buscando laudo com evidenciaId ObjectId:', objectId);
+
     const laudo = await this.laudoModel
-      .findOne({ evidenciaId: objectId })
+      .findOne({ evidenciaId: objectId }) // <== necessário usar ObjectId
       .exec();
+
+    if (!laudo) {
+      throw new NotFoundException(
+        `Laudo não encontrado para evidência ${evidenciaId}`,
+      );
+    }
 
     return laudo;
   }
-
   async update(id: string, updateLaudoDTO: UpdateLaudoDTO): Promise<Laudo> {
     const updatedLaudo = await this.laudoModel.findByIdAndUpdate(
       id,

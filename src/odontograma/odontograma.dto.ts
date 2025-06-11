@@ -7,7 +7,15 @@ export class CreateOdontogramaDTO {
 
   @IsString()
   @IsOptional()
+  tipodente: string;
+
+  @IsString()
+  @IsOptional()
   observacoes: string;
+  
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
 
   @IsString()
   @IsNotEmpty()

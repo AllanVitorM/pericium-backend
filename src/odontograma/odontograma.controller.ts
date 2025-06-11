@@ -5,10 +5,13 @@ import {
   Get,
   Delete,
   Param,
+  UploadedFile,
+  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 import { OdontogramaService } from './odontograma.service';
 import { CreateOdontogramaDTO } from './odontograma.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { JwtAuthGuard } from 'src/auth/jwtAuthGuard';
@@ -19,6 +22,8 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
+  ApiBody,
+  ApiConsumes,
   ApiParam,
 } from '@nestjs/swagger';
 
@@ -31,10 +36,32 @@ export class OdontogramaController {
 
   @Roles(Role.ADMIN, Role.PERITO)
   @Post('createodontograma')
-  @ApiOperation({ summary: 'Criar um novo odontograma' })
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Criar novo odontograma com upload de imagem' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Dados do odontograma + imagem',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        dente: { type: 'string' },
+        tipoDente: { type: 'string' },
+        observacoes: { type: 'string' },
+        idVitimas: { type: 'string' },
+      },
+      required: ['dente', 'tipoDente', 'observacoes', 'idVitimas'], // <- isso importa
+    },
+  })
   @ApiResponse({ status: 201, description: 'Odontograma criado com sucesso' })
-  async create(@Body() createOdontogramaDTO: CreateOdontogramaDTO) {
-    return this.odontogramaService.create(createOdontogramaDTO);
+  async createOdontograma(
+    @Body() body: CreateOdontogramaDTO,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.odontogramaService.create(body, file);
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
