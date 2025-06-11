@@ -1,29 +1,37 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 export type LaudoDocument = Laudo & Document;
-@Schema()
-export class Laudo extends Document {
-  @Prop({ required: true })
-  title: string;
 
-  @Prop()
-  description?: string;
+@Schema({ timestamps: true })
+export class Laudo {
+  @Prop({ required: true }) title: string;
 
-  @Prop()
-  pdfUrl?: string;
+  @Prop() description?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Evidencia' })
-  evidenciaId: string;
+  @Prop() pdfUrl?: string;
 
-  @Prop({ default: false })
-  assinado: boolean;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Evidencia', unique: true })
+  evidenciaId: Types.ObjectId;
 
-  @Prop()
-  dataAssinatura?: Date;
+  @Prop({ default: false }) assinado: boolean;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
-  peritoAssinante?: Types.ObjectId;
+  @Prop() dataAssinatura?: Date;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' }) peritoAssinante?: Types.ObjectId;
+
+  // ✅ Adicionado para evitar erro no TypeScript
+  _id?: Types.ObjectId;
 }
 
 export const LaudoSchema = SchemaFactory.createForClass(Laudo);
+
+// ✅ Permite exibir o "id" em vez de "_id"
+LaudoSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (_, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+  },
+});

@@ -1,99 +1,83 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
+  Relatorio,
+  RelatorioDocument,
+} from './relatorio.schema';
+import {
   CreateRelatorioDTO,
   UpdateRelatorioDTO,
-} from 'src/relatorios/relatorio.dto';
-import { Relatorio, RelatorioDocument } from 'src/relatorios/relatorio.schema';
+} from './relatorio.dto';
 import { PdfService } from './shared/pdf.service';
-import { CaseDocument } from 'src/cases/case.schema';
-import { Status } from 'src/common/enums/status.enum';
 
 @Injectable()
 export class RelatorioService {
   constructor(
-    @InjectModel('Relatorio')
-    private readonly RelatorioModel: Model<RelatorioDocument>,
+    @InjectModel(Relatorio.name)
+    private relatorioModel: Model<RelatorioDocument>,
     private readonly pdfService: PdfService,
-    @InjectModel('Case')
-    private readonly casoModel: Model<CaseDocument>,
   ) {}
 
-  async create(CreateRelatorioDTO: CreateRelatorioDTO): Promise<Relatorio> {
-    const createdRelatorio = new this.RelatorioModel({
-      ...CreateRelatorioDTO,
-      assinado: true,
-      dataAssinatura: new Date(),
-      peritoAssinante: new Types.ObjectId(CreateRelatorioDTO.userId),
+  async create(dto: CreateRelatorioDTO, caseId: string): Promise<Relatorio> {
+    if (!Types.ObjectId.isValid(caseId)) {
+      throw new NotFoundException('ID do caso inválido.');
+    }
+
+    const exists = await this.relatorioModel.findOne({ caseId });
+    if (exists) {
+      throw new ConflictException('Já existe um relatório para este caso.');
+    }
+
+    const rel = new this.relatorioModel({
+      title: dto.title,
+      description: dto.description,
+      caseId: new Types.ObjectId(caseId),
+      peritoAssinante: new Types.ObjectId(dto.userId),
     });
 
-    await createdRelatorio.save();
+    await rel.save();
 
-    const pdfUrl = await this.pdfService.gerarRelatorioPDF(createdRelatorio);
-    createdRelatorio.pdfUrl = pdfUrl;
-    await createdRelatorio.save();
+    const pdfUrl = await this.pdfService.gerarRelatorioPDF(rel);
+    rel.pdfUrl = pdfUrl;
+    return rel.save();
+  }
 
-    if (CreateRelatorioDTO.caseId) {
-      await this.fecharCaso(CreateRelatorioDTO.caseId);
+  async findByCaso(caseId: string): Promise<Relatorio> {
+    const rel = await this.relatorioModel
+      .findOne({ caseId })
+      .populate('caseId')
+      .populate('peritoAssinante');
+
+    if (!rel) {
+      throw new NotFoundException('Relatório não encontrado para este caso.');
     }
 
-    return createdRelatorio;
+    return rel;
   }
 
-  async findAll(): Promise<any[]> {
-    return this.RelatorioModel.find()
-      .populate('peritoAssinante', 'nome email')
-      .populate({
-        path: 'caseId',
-        populate: {
-          path: 'caseId',
-        },
-      })
-      .exec();
-  }
+  async update(id: string, dto: UpdateRelatorioDTO): Promise<Relatorio> {
+    const rel = await this.relatorioModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
 
-  async findbyCase(caseId: string): Promise<any[]> {
-    return this.RelatorioModel.find({ caseId: caseId })
-      .populate('peritoAssinante', 'nome email')
-      .exec();
-  }
-
-  async update(
-    id: string,
-    updateRelatorioDTO: UpdateRelatorioDTO,
-  ): Promise<Relatorio> {
-    const updatedRelatorio = await this.RelatorioModel.findByIdAndUpdate(
-      id,
-      updateRelatorioDTO,
-      { new: true },
-    );
-    if (!updatedRelatorio) {
-      throw new NotFoundException(`Relatório com ID ${id} não encontrado`);
+    if (!rel) {
+      throw new NotFoundException('Relatório não encontrado.');
     }
 
-    const pdfUrl = await this.pdfService.gerarRelatorioPDF(updatedRelatorio);
-    updatedRelatorio.pdfUrl = pdfUrl;
-    await updatedRelatorio.save();
-    return updatedRelatorio;
-  }
-
-  async findOneById(id: string): Promise<Relatorio | null> {
-    return this.RelatorioModel.findById(id);
+    const pdfUrl = await this.pdfService.gerarRelatorioPDF(rel);
+    rel.pdfUrl = pdfUrl;
+    return rel.save();
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.RelatorioModel.findByIdAndDelete(id);
-    if (!result)
-      throw new NotFoundException('Relatorio não encontrado para deletar');
-  }
-
-  async fecharCaso(caseId: string) {
-    const caso = await this.casoModel.findById(caseId);
-    if (!caso) {
-      throw new NotFoundException(`Caso não encontrado ${caseId}`);
+    const deleted = await this.relatorioModel.findByIdAndDelete(id);
+    if (!deleted) {
+      throw new NotFoundException('Relatório não encontrado para deletar.');
     }
-    caso.status = Status.CONCLUIDO;
-    await caso.save();
   }
 }

@@ -1,9 +1,10 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 export type RelatorioDocument = Relatorio & Document;
-@Schema()
-export class Relatorio extends Document {
+
+@Schema({ timestamps: true })
+export class Relatorio {
   @Prop({ required: true })
   title: string;
 
@@ -13,17 +14,17 @@ export class Relatorio extends Document {
   @Prop()
   pdfUrl?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Caso' })
-  caseId: string;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Caso', unique: true })
+  caseId: Types.ObjectId;
 
   @Prop({ default: false })
   assinado: boolean;
 
-  @Prop()
+  @Prop({ type: Date })
   dataAssinatura?: Date;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
-  peritoAssinante?: Types.ObjectId;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
+  peritoAssinante: Types.ObjectId;
 }
 
 export const RelatorioSchema = SchemaFactory.createForClass(Relatorio);

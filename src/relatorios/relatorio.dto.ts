@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateRelatorioDTO {
   @ApiProperty()
@@ -7,47 +7,25 @@ export class CreateRelatorioDTO {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  descricao: string;
-
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  pdfUrl?: string;
+  description?: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  caseId: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
+  userId: string; // será mapeado para peritoAssinante
 }
 
 export class UpdateRelatorioDTO {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   title?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  descricao?: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  pdfUrl?: string;
-}
-
-export class AssinarRelatorioDTO {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  peritoId: string;
+  description?: string;
 }

@@ -1,100 +1,62 @@
 import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Put,
-  Delete,
-  Param,
-  Patch,
-  NotFoundException,
-  UseGuards,
+  Controller, Post, Body, Get, Param, Put, Patch, Delete, UseGuards
 } from '@nestjs/common';
 import { LaudoService } from './laudo.service';
-import {
-  AssinarLaudoDTO,
-  CreateLaudoDTO,
-  UpdateLaudoDTO,
-} from 'src/laudos/laudo.dto';
-import { Laudo } from './laudo.schema';
+import { CreateLaudoDTO, UpdateLaudoDTO, AssinarLaudoDTO } from './laudo.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuthGuard';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { Role } from 'src/common/enums/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
-
-// 🔽 Swagger imports
-import {
-  ApiTags,
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
+import { Role } from 'src/common/enums/role.enum';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Laudos')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('laudos')
 export class LaudoController {
-  constructor(private readonly laudoService: LaudoService) {}
+  constructor(private readonly svc: LaudoService) {}
 
   @Roles(Role.ADMIN, Role.PERITO)
-  @Post('createreport')
-  @ApiOperation({ summary: 'Criar um novo laudo' })
-  @ApiResponse({ status: 201, description: 'Laudo criado com sucesso' })
-  async create(@Body() createLaudoDto: CreateLaudoDTO) {
-    return this.laudoService.create(createLaudoDto);
+  @Post()
+  @ApiOperation({ summary: 'Criar novo laudo' })
+  create(@Body() dto: CreateLaudoDTO) {
+    return this.svc.create(dto);
   }
 
   @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
   @Get()
   @ApiOperation({ summary: 'Listar todos os laudos' })
-  async findAll() {
-    return this.laudoService.findAll();
+  findAll() {
+    return this.svc.findAll();
   }
 
   @Roles(Role.ADMIN, Role.PERITO, Role.ASSISTENTE)
-  @Get('evidence/:id')
-  @ApiOperation({ summary: 'Buscar laudo por evidência (ID)' })
-  @ApiParam({ name: 'id', required: true })
-  async findByEvidencia(@Param('id') id: string) {
-    console.log('ID recebido no endpoint /evidence/:id =>', id);
-    return this.laudoService.findbyEvidencia(id);
+  @Get('evidencia/:evidenciaId')
+  @ApiOperation({ summary: 'Buscar laudo por evidência' })
+  @ApiParam({ name: 'evidenciaId', required: true })
+  findByEvidencia(@Param('evidenciaId') id: string) {
+    return this.svc.findByEvidencia(id);
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar dados do laudo' })
-  @ApiParam({ name: 'id', required: true })
-  async update(
-    @Param('id') id: string,
-    @Body() updateLaudoDTO: UpdateLaudoDTO,
-  ): Promise<Laudo> {
-    return this.laudoService.update(id, updateLaudoDTO);
+  @ApiOperation({ summary: 'Atualizar laudo' })
+  update(@Param('id') id: string, @Body() dto: UpdateLaudoDTO) {
+    return this.svc.update(id, dto);
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
   @Patch('sign/:id')
-  @ApiOperation({ summary: 'Assinar laudo por ID' })
+  @ApiOperation({ summary: 'Assinar laudo' })
   @ApiParam({ name: 'id', required: true })
-  async AssinarLaudo(
-    @Param('id') id: string,
-    @Body() { peritoId }: AssinarLaudoDTO,
-  ) {
-    const laudo = await this.laudoService.findOneById(id);
-
-    if (!laudo) throw new NotFoundException('Laudo não encontrado.');
-
-    if (laudo.assinado) throw new Error('Laudo já assinado');
-
-    return this.laudoService.AssinarLaudo(id, peritoId);
+  sign(@Param('id') id: string, @Body() dto: AssinarLaudoDTO) {
+    return this.svc.sign(id, dto.peritoId);
   }
 
   @Roles(Role.ADMIN, Role.PERITO)
   @Delete(':id')
-  @ApiOperation({ summary: 'Remover laudo por ID' })
-  @ApiParam({ name: 'id', required: true })
+  @ApiOperation({ summary: 'Remover laudo' })
   remove(@Param('id') id: string) {
-    return this.laudoService.remove(id);
+    return this.svc.remove(id);
   }
 }
