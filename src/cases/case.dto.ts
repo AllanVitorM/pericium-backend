@@ -8,10 +8,6 @@ import { Status } from 'src/common/enums/status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCaseDTO {
-  @IsString()
-  @IsNotEmpty()
-  _id: string;
-
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
