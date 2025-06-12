@@ -6,13 +6,10 @@ import {
   Put,
   Delete,
   Param,
-  Patch,
-  NotFoundException,
   UseGuards,
 } from '@nestjs/common';
 import { RelatorioService } from './relatorio.service';
 import {
-  AssinarRelatorioDTO,
   CreateRelatorioDTO,
   UpdateRelatorioDTO,
 } from 'src/relatorios/relatorio.dto';

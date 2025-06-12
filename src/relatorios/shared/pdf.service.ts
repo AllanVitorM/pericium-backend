@@ -6,71 +6,88 @@ import { Relatorio } from '../relatorio.schema';
 
 @Injectable()
 export class PdfService {
-  async gerarRelatorioPDF(Relatorio: Relatorio): Promise<string> {
-    const doc = new PDFDocument();
+  async gerarRelatorioPDF(relatorio: Relatorio): Promise<string> {
+    const doc = new PDFDocument({ margin: 50 });
     const buffers: Uint8Array[] = [];
 
     doc.on('data', (chunk: Uint8Array) => buffers.push(chunk));
 
-    // Título
+    const addFooter = () => {
+      const range = doc.bufferedPageRange();
+      for (let i = range.start; i < range.start + range.count; i++) {
+        doc.switchToPage(i);
+        doc
+          .fontSize(9)
+          .fillColor('gray')
+          .text(`Página ${i + 1} de ${range.count}`, 50, doc.page.height - 50, {
+            align: 'center',
+          });
+      }
+    };
+
+    // Cabeçalho institucional
     doc
-      .font('Times-Bold')
-      .fontSize(22)
-      .text('RELATORIO PERICIAL TÉCNICO', { align: 'center' })
+      .image('src/assets/logo.png', 50, 40, { width: 70 }) // Opcional
+      .fontSize(16)
+      .font('Helvetica-Bold')
+      .text('Instituto de Perícia Técnica e Criminalística', 130, 50, {
+        align: 'center',
+      })
       .moveDown(2);
 
-    // Cabeçalho
+    // Informações do relatório
     doc
       .fontSize(12)
-      .font('Times-Roman')
-      .text(`Nº do Relatório: ${Relatorio._id}`, { align: 'left' })
-      .text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`)
-      .moveDown();
+      .font('Helvetica')
+      .text(`Número do Relatório: ${relatorio._id}`, { continued: true })
+      .text(`   |   Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`)
+      .moveDown(1.5);
 
-    // Seção: Título
+    // Título do documento
     doc
-      .font('Times-Bold')
       .fontSize(14)
-      .text('Título:', { underline: true })
-      .moveDown(0.2)
-      .font('Times-Roman')
-      .fontSize(12)
-      .text(Relatorio.title)
-      .moveDown();
-
-    // Seção: Descrição
-    doc
-      .font('Times-Bold')
-      .fontSize(14)
-      .text('Descrição:', { underline: true })
-      .moveDown(0.2)
-      .font('Times-Roman')
-      .fontSize(12)
-      .text(Relatorio.description || 'Sem descrição disponível')
+      .font('Helvetica-Bold')
+      .text('Relatório Técnico Pericial Completo', {
+        align: 'center',
+        underline: true,
+      })
       .moveDown(2);
 
-    // Assinatura
-    if (Relatorio.assinado && Relatorio.peritoAssinante && Relatorio.dataAssinatura) {
+    // Conteúdo técnico gerado por LLM
+    doc
+      .fontSize(12)
+      .font('Helvetica')
+      .text(relatorio.conteudo || 'Sem conteúdo disponível', {
+        align: 'justify',
+      })
+      .moveDown(2);
+
+    // Assinatura do perito (caso assinado)
+    if (
+      relatorio.assinado &&
+      relatorio.peritoAssinante &&
+      relatorio.dataAssinatura
+    ) {
       const nomePerito =
-        typeof Relatorio.peritoAssinante === 'object' &&
-        'name' in Relatorio.peritoAssinante
-          ? Relatorio.peritoAssinante.name
+        typeof relatorio.peritoAssinante === 'object' &&
+        'name' in relatorio.peritoAssinante
+          ? relatorio.peritoAssinante.name
           : 'Perito Desconhecido';
 
       doc
-        .font('Times-Roman')
+        .moveDown(4)
+        .font('Helvetica')
         .fontSize(12)
-        .text(`${nomePerito}`, { align: 'center' })
+        .text(nomePerito as string, { align: 'center' })
         .text('____________________________________', { align: 'center' })
         .text(
-          `Assinado em: ${new Date(Relatorio.dataAssinatura).toLocaleDateString('pt-BR')}`,
-          {
-            align: 'center',
-          },
+          `Assinado em: ${new Date(relatorio.dataAssinatura).toLocaleDateString('pt-BR')}`,
+          { align: 'center' },
         );
     }
 
     doc.end();
+    doc.on('end', () => addFooter());
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       doc.on('end', () => resolve(Buffer.concat(buffers)));
@@ -84,8 +101,8 @@ export class PdfService {
         const stream = cloudinary.uploader.upload_stream(
           {
             resource_type: 'raw',
-            folder: 'laudos',
-            public_id: `laudo-${Relatorio._id}`,
+            folder: 'relatorios',
+            public_id: `relatorio-${relatorio._id}`,
             format: 'pdf',
           },
           (err, result) => {
@@ -93,10 +110,11 @@ export class PdfService {
             resolve(result as UploadApiResponse);
           },
         );
-        const readSteam = streamifier.createReadStream(buffer);
-        readSteam.pipe(stream);
+        const readStream = streamifier.createReadStream(buffer);
+        readStream.pipe(stream);
       },
     );
+
     return uploadResult.secure_url;
   }
 }

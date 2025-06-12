@@ -5,7 +5,7 @@ import { CreateLaudoDTO, UpdateLaudoDTO } from 'src/laudos/laudo.dto';
 import { Laudo, LaudoDocument } from 'src/laudos/laudo.schema';
 import { PdfService } from './shared/pdf.service';
 import { EvidenciaService } from 'src/evidencias/evidencia.service';
-import { GeminiService } from 'src/gemini/gemini.service';
+import { GeminiService } from 'src/gemini_laudo/gemini.service';
 import { ReplicateService } from 'src/replicate/replicate.service';
 
 @Injectable()

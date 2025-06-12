@@ -10,7 +10,7 @@ export class Odontograma extends Document {
 
   @Prop()
   tipodente: string;
-  
+
   @Prop()
   imageUrl?: string;
 

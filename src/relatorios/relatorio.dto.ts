@@ -10,7 +10,7 @@ export class CreateRelatorioDTO {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  descricao: string;
+  conteudo: string;
 
   @ApiProperty()
   @IsString()

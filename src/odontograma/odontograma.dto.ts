@@ -12,7 +12,7 @@ export class CreateOdontogramaDTO {
   @IsString()
   @IsOptional()
   observacoes: string;
-  
+
   @IsString()
   @IsOptional()
   imageUrl?: string;
